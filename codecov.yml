@@ -1,5 +1,8 @@
 comment: false
 
+ignore:
+  - "^.*Models.*$"
+
 coverage:
   status:
     project:
