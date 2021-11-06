@@ -20,10 +20,6 @@ namespace DomainTests.Models
             _menu = new Menu();
 
             _menu.MenuItems.Count.Should().Be(0);
-
-            _menu.AddMenuItem(_menuItem);
-
-            _menu.MenuItems.Count.Should().Be(1);
         }
     }
 }

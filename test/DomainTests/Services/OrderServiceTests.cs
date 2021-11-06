@@ -1,6 +1,6 @@
-﻿using System;
+﻿using System.Threading.Tasks;
 using AutoFixture;
-using Domain.Interfaces;
+using Domain.Interfaces.Repositories;
 using Domain.Models;
 using Domain.Services;
 using FluentAssertions;
@@ -14,6 +14,9 @@ namespace DomainTests.Services
         private const double Price1 = 42.0;
         private const double Price2 = 2.0;
         private readonly IFixture _fixture = new Fixture();
+        private readonly Order _order;
+        private readonly MenuItem _menuItem1;
+        private readonly MenuItem _menuItem2;
 
         private readonly IOrderRepository _orderRepository = Substitute.For<IOrderRepository>();
         private readonly OrderService _sut;
@@ -21,65 +24,71 @@ namespace DomainTests.Services
         public OrderServiceTests()
         {
             _sut = new OrderService(_orderRepository);
+            
+            _menuItem1 = _fixture
+                .Build<MenuItem>()
+                .With(i => i.Price, -1)
+                .Create();
+            
+            _menuItem2 = _fixture
+                .Build<MenuItem>()
+                .With(i => i.Price, -1)
+                .Create();
+            
+            _order = _fixture
+                .Create<Order>();
         }
 
         [Fact]
-        public void AddItemToOrderTest()
+        public async Task AddItemToOrderTest()
         {
-            var menuItem1 = _fixture
-                .Build<MenuItem>()
-                .With(i => i.Price, Price1)
-                .Create();
+            _menuItem1.Price = Price1;
+            _menuItem2.Price = Price2;
 
-            var menuItem2 = _fixture
-                .Build<MenuItem>()
-                .With(i => i.Price, Price2)
-                .Create();
+            _orderRepository.UpdateOrder(Arg.Any<Order>()).Returns(Task.FromResult(true));
 
-            _orderRepository.UpdateOrder(Arg.Any<Order>()).Returns(true);
-
-            var order = _sut.AddItemToOrder(menuItem1);
+            var order = await _sut.AddItemToOrder(_menuItem1);
 
             order.Price.Should().Be(Price1);
+            await _orderRepository.Received(1).UpdateOrder(order);
+            await _orderRepository.Received(1).SaveChanges();
 
-            _sut.AddItemToOrder(order, menuItem2);
-
+            await _sut.AddItemToOrder(order, _menuItem2);
+            
             order.Price.Should().Be(Price1 + Price2);
+            await _orderRepository.Received(2).UpdateOrder(order);
+            await _orderRepository.Received(2).SaveChanges();
 
-            _sut.AddItemToOrder(order, menuItem2, 2);
+            await _sut.AddItemToOrder(order, _menuItem2, 2);
 
             order.Price.Should().Be(Price1 + Price2 * 3);
+            await _orderRepository.Received(3).UpdateOrder(order);
+            await _orderRepository.Received(3).SaveChanges();
         }
 
         [Fact]
         public void AddItemToOrderWithBadCount()
         {
-            var menuItem1 = _fixture
-                .Create<MenuItem>();
+            var task = Task.Run(() => _sut.AddItemToOrder(_menuItem1, 0));
 
-            Action act = () => _sut.AddItemToOrder(menuItem1, 0);
+            var exception = Record.ExceptionAsync(async () => await task);
 
-            act.Should()
-                .Throw<ArgumentException>()
-                .WithMessage("count cannot be less than 0. Was 0");
+            exception.Should().NotBeNull();
+            exception.Result.Should().NotBeNull();
+            exception.Result?.Message.Should().Be("count cannot be less than 0. Was 0");
         }
 
         [Fact]
-        public void AddItemToOrderWithSaveChangesFalse()
+        public void AddItemToOrderWithUpdateOrderFalse()
         {
-            var menuItem1 = _fixture
-                .Create<MenuItem>();
+            _orderRepository.UpdateOrder(_order).Returns(Task.FromResult(false));
 
-            var order = _fixture
-                .Create<Order>();
+            var task = Task.Run(() => _sut.AddItemToOrder(_order, _menuItem1));
+            var exception = Record.ExceptionAsync(async () => await task);
 
-            _orderRepository.UpdateOrder(order).Returns(false);
-
-            Action act = () => _sut.AddItemToOrder(order, menuItem1);
-
-            act.Should()
-                .Throw<Exception>()
-                .WithMessage("Something went wrong");
+            exception.Should().NotBeNull();
+            exception.Result.Should().NotBeNull();
+            exception.Result?.Message.Should().Be("Something went wrong");
         }
     }
 }
