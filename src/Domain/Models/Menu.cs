@@ -13,10 +13,5 @@ namespace Domain.Models
         }
 
         public ICollection<MenuItem> MenuItems { get; }
-
-        public void AddMenuItem(MenuItem menuItem)
-        {
-            MenuItems.Add(menuItem);
-        }
     }
 }
