@@ -18,11 +18,6 @@ namespace Application.Controllers
         private readonly ILogger _logger;
         private readonly IMediator _mediator;
 
-        /// <summary>
-        /// Mediator and Serilog are injected
-        /// </summary>
-        /// <param name="mediator"></param>
-        /// <param name="logger"></param>
         public UsersController(IMediator mediator, ILogger logger)
         {
             _logger = logger;
