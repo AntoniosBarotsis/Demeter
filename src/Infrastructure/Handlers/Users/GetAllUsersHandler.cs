@@ -2,19 +2,17 @@
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
-using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
-using Domain.Models;
 using Infrastructure.DTOs.Response;
 using Infrastructure.Queries.Users;
 using MediatR;
 
 namespace Infrastructure.Handlers.Users
 {
-    public class GetAllUsersHandler: IRequestHandler<GetAllUsersQuery, List<UserResponse>>
+    public class GetAllUsersHandler : IRequestHandler<GetAllUsersQuery, List<UserResponse>>
     {
-        private readonly IUserService _userService;
         private readonly IMapper _mapper;
+        private readonly IUserService _userService;
 
         public GetAllUsersHandler(IUserService userService, IMapper mapper)
         {

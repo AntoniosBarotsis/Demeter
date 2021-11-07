@@ -1,6 +1,8 @@
 ﻿using System.Threading.Tasks;
 using Infrastructure.Queries.Users;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
@@ -13,6 +15,7 @@ namespace Application.Controllers
     [ApiController]
     [ApiExplorerSettings(GroupName = "v1")]
     [Route("v1/[controller]")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class UsersController: ControllerBase
     {
         private readonly ILogger _logger;
