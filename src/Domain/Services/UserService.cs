@@ -22,13 +22,13 @@ namespace Domain.Services
 
         public async Task<List<User>> FindAll(CancellationToken cancellationToken)
         {
-            var cachedRes = await _cache.GetCacheValueAsync("users:all");
+            var cachedRes = await _cache.GetCacheValueAsync(ICacheService.Entity.Users, ICacheService.Type.FindAll);
 
             if (cachedRes is not null) return JsonSerializer.Deserialize<List<User>>(cachedRes);
 
             var res = await _userRepository.FindAll(cancellationToken);
 
-            await _cache.SetCacheValueAsync("users:all", res);
+            await _cache.SetCacheValueAsync(ICacheService.Entity.Users, ICacheService.Type.FindAll, res);
 
             return res;
         }
