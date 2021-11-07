@@ -3,7 +3,9 @@ using System.IO;
 using System.Reflection;
 using Application.Config;
 using Domain.Interfaces.Repositories;
+using Domain.Interfaces.Services;
 using Domain.Models;
+using Domain.Services;
 using Infrastructure.Data;
 using Infrastructure.Repositories;
 using MediatR;
@@ -33,6 +35,7 @@ namespace Application
         {
             services.AddScoped<IDatabaseSeeder, DatabaseSeeder>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IUserService, UserService>();
 
             services.AddDbContext<DemeterDbContext>(opt =>
                 {
