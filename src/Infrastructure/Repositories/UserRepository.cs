@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Domain.Interfaces.Repositories;
 using Domain.Models;
@@ -16,9 +17,9 @@ namespace Infrastructure.Repositories
             _context = context;
         }
 
-        public async Task<IEnumerable<User>> FindAll()
+        public async Task<List<User>> FindAll(CancellationToken cancellationToken)
         {
-            return await _context.Users.ToListAsync();
+            return await _context.Users.ToListAsync(cancellationToken);
         }
     }
 }
