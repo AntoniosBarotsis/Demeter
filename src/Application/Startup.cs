@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using Application.Config;
+using Domain.Interfaces;
 using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
 using Domain.Models;
@@ -18,6 +19,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using StackExchange.Redis;
 
 namespace Application
 {
@@ -36,6 +38,10 @@ namespace Application
             services.AddScoped<IDatabaseSeeder, DatabaseSeeder>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IUserService, UserService>();
+
+            services.AddSingleton<IConnectionMultiplexer>(_ =>
+                ConnectionMultiplexer.Connect(Configuration.GetConnectionString("RedisConnection")));
+            services.AddSingleton<ICacheService, RedisCacheService>();
 
             services.AddDbContext<DemeterDbContext>(opt =>
                 {
