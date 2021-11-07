@@ -1,9 +1,10 @@
 using System;
+using System.IO;
 using System.Reflection;
+using Application.Config;
 using Domain.Interfaces.Repositories;
 using Domain.Models;
 using Infrastructure.Data;
-using Infrastructure.Handlers.Users;
 using Infrastructure.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -53,10 +54,22 @@ namespace Application
                 options.Password.RequireNonAlphanumeric = false;
             });
 
-            services.AddControllers();
+            services.AddControllers(opt => { opt.UseGeneralRoutePrefix("api/"); });
+
+            // services.AddApiVersioning(opt =>
+            // {
+            //     opt.DefaultApiVersion = ApiVersion.Default;
+            //     opt.ReportApiVersions = true;
+            // });
+
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Application", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Application - v1", Version = "v1" });
+                c.SwaggerDoc("v2", new OpenApiInfo { Title = "Application - v2", Version = "v2" });
+
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath, true); // <== Added the true here, to show the controller description
             });
 
             services.AddMediatR(Assembly.Load("Infrastructure"));
@@ -80,7 +93,11 @@ namespace Application
 
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Application v1"));
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Application v1");
+                    c.SwaggerEndpoint("/swagger/v2/swagger.json", "Application v2");
+                });
             }
 
             app.UseHttpsRedirection();
@@ -89,7 +106,10 @@ namespace Application
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
+            });
         }
     }
 }
