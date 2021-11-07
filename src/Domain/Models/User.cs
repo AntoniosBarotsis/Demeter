@@ -7,6 +7,13 @@ namespace Domain.Models
     /// </summary>
     public class User : UserAbstract
     {
-        private ICollection<Order> PastOrders { get; set; }
+        public List<Order> PastOrders { get; set; }
+
+        public User(string userName, string email)
+        {
+            UserName = userName;
+            Email = email;
+            PastOrders = new List<Order>();
+        }
     }
 }

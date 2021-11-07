@@ -19,7 +19,10 @@ namespace Infrastructure.Repositories
 
         public async Task<List<User>> FindAll(CancellationToken cancellationToken)
         {
-            return await _context.Users.ToListAsync(cancellationToken);
+            return await _context
+                .Users
+                .Include(u => u.PastOrders)
+                .ToListAsync(cancellationToken);
         }
     }
 }

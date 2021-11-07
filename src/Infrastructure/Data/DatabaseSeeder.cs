@@ -28,11 +28,13 @@ namespace Infrastructure.Data
             _logger.Information("Seeding Database...");
             
             // Create users
+            var order = new Order {Id = 1, Items = null, Price = 42};
+            var pastOrders = new List<Order>{ order };
             var users = new List<User>
             {
-                new() { UserName = "Tony", Email = "test@test.com" }
+                new("Tony", "test@test.com") {PastOrders = pastOrders}
             };
-
+            
             using var serviceScope = _scopeFactory.CreateScope();
             using var context = serviceScope.ServiceProvider.GetService<DemeterDbContext>();
 
@@ -44,6 +46,7 @@ namespace Infrastructure.Data
             
             // Clear all users from the database
             context.Users.RemoveRange(context.Users);
+            context.Orders.RemoveRange(context.Orders);
             context.SaveChanges();
             
             // Push the users from the list

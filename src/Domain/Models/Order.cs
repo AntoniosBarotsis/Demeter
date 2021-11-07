@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Models
 {
@@ -8,12 +9,12 @@ namespace Domain.Models
     /// </summary>
     public class Order
     {
-        private Guid _id;
+        [Key] 
+        public int Id { get; set; }
         public ICollection<MenuItem> Items;
 
         public Order()
         {
-            _id = new Guid();
             Items = new List<MenuItem>();
             Price = 0;
         }

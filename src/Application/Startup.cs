@@ -83,6 +83,8 @@ namespace Application
             });
 
             services.AddMediatR(Assembly.Load("Infrastructure"));
+
+            services.AddAutoMapper(Assembly.Load("Infrastructure"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
