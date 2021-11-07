@@ -8,6 +8,7 @@ using Domain.Interfaces.Services;
 using Domain.Models;
 using Domain.Services;
 using Infrastructure.Data;
+using Infrastructure.Data.Redis;
 using Infrastructure.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Builder;

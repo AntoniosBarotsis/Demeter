@@ -5,7 +5,7 @@ using Domain.Interfaces;
 using Serilog;
 using StackExchange.Redis;
 
-namespace Infrastructure.Repositories
+namespace Infrastructure.Data.Redis
 {
     public class RedisCacheService : ICacheService
     {
