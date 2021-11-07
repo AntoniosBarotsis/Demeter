@@ -1,5 +1,11 @@
+using System;
+using System.Reflection;
+using Domain.Interfaces.Repositories;
 using Domain.Models;
 using Infrastructure.Data;
+using Infrastructure.Handlers.Users;
+using Infrastructure.Repositories;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -25,6 +31,7 @@ namespace Application
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<IDatabaseSeeder, DatabaseSeeder>();
+            services.AddScoped<IUserRepository, UserRepository>();
 
             services.AddDbContext<DemeterDbContext>(opt =>
                 {
@@ -51,6 +58,8 @@ namespace Application
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Application", Version = "v1" });
             });
+
+            services.AddMediatR(Assembly.Load("Infrastructure"));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
