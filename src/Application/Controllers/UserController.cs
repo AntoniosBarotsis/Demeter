@@ -15,7 +15,7 @@ namespace Application.Controllers
     [ApiController]
     [ApiExplorerSettings(GroupName = "v1")]
     [Route("v1/[controller]")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "User")]
     public class UsersController: ControllerBase
     {
         private readonly ILogger _logger;

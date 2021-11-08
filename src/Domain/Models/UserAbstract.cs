@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.Runtime.Serialization;
+using Microsoft.AspNetCore.Identity;
 
 namespace Domain.Models
 {
@@ -8,5 +9,15 @@ namespace Domain.Models
     /// </summary>
     public abstract class UserAbstract : IdentityUser
     {
+        public UserType UserType { get; set; }
+    }
+
+    /// <summary>
+    /// Different user types. Owner is for restaurant owner while user is a normal consumer.
+    /// </summary>
+    public enum UserType
+    {
+        Owner,
+        User
     }
 }

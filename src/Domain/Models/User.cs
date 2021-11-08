@@ -14,6 +14,7 @@ namespace Domain.Models
             UserName = userName;
             Email = email;
             PastOrders = new List<Order>();
+            UserType = UserType.User;
         }
     }
 }

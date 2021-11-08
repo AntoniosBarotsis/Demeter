@@ -7,5 +7,6 @@ namespace Infrastructure.DTOs.Response
     {
         public string UserName { get; set; }
         public List<Order> PastOrders { get; set; }
+        public string UserType { get; set; }
     }
 }

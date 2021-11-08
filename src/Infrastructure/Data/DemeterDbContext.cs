@@ -1,4 +1,5 @@
-﻿using Domain.Models;
+﻿using System;
+using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data
@@ -14,6 +15,12 @@ namespace Infrastructure.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Convert enum to string instead of an int
+            modelBuilder
+                .Entity<User>()
+                .Property(u => u.UserType)
+                .HasConversion<string>();
+                
             modelBuilder
                 .Entity<User>()
                 .HasMany(u => u.PastOrders);
