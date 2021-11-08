@@ -28,7 +28,7 @@ namespace Domain.Services
             _logger = logger;
         }
 
-        public async Task<AuthenticationResult> RegisterAsync(string username, string email, string password, bool isOwner = false)
+        public async Task<AuthenticationResult> RegisterAsync(string username, string email, string password, UserType userType = UserType.User)
         {
             var existingUser = await _userManager.FindByEmailAsync(email);
 
@@ -48,7 +48,7 @@ namespace Domain.Services
                     Errors = createdUser.Errors.Select(x => x.Description)
                 };
 
-            var role = isOwner ? "Owner" : "User";
+            var role = userType.ToString();
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_jwtConfig.Secret);
