@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Interfaces;
 using Domain.Interfaces.Services;
 using Domain.Models;
 using Domain.Models.Auth;
@@ -18,9 +19,9 @@ namespace Domain.Services
     {
         private readonly JwtConfig _jwtConfig;
         private readonly ILogger _logger;
-        private readonly UserManager<User> _userManager;
+        private readonly IUserManager _userManager;
 
-        public AuthService(UserManager<User> userManager, JwtConfig jwtConfig, ILogger logger)
+        public AuthService(IUserManager userManager, JwtConfig jwtConfig, ILogger logger)
         {
             _userManager = userManager;
             _jwtConfig = jwtConfig;
