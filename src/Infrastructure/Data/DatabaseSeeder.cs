@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Domain.Interfaces;
 using Domain.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -14,9 +15,9 @@ namespace Infrastructure.Data
     {
         private readonly ILogger _logger;
         private readonly IServiceScopeFactory _scopeFactory;
-        private readonly UserManager<User> _userManager;
+        private readonly IUserManager _userManager;
 
-        public DatabaseSeeder(IServiceScopeFactory scopeFactory, ILogger logger, UserManager<User> userManager)
+        public DatabaseSeeder(IServiceScopeFactory scopeFactory, ILogger logger, IUserManager userManager)
         {
             _scopeFactory = scopeFactory;
             _logger = logger;
