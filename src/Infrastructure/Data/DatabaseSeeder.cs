@@ -29,10 +29,12 @@ namespace Infrastructure.Data
             
             // Create users
             var order = new Order {Id = 1, Items = null, Price = 42};
-            var pastOrders = new List<Order>{ order };
+            var u1 = new User("Tony", "test@test.com");
+            u1.PastOrders.Add(order);
+            
             var users = new List<User>
             {
-                new("Tony", "test@test.com") {PastOrders = pastOrders}
+                u1
             };
             
             using var serviceScope = _scopeFactory.CreateScope();
