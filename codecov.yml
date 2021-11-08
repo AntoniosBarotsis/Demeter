@@ -3,6 +3,7 @@ comment: false
 ignore:
   - "^.*Models.*$"
   - "^.*Migrations.*$"
+  - "^.*Infrastructure.*$"
 
 coverage:
   status:
