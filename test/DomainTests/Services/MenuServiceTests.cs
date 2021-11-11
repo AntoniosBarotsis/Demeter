@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using AutoFixture;
 using Domain.Interfaces.Repositories;
 using Domain.Models;
@@ -16,18 +15,18 @@ namespace DomainTests.Services
         private readonly IFixture _fixture = new Fixture();
         private readonly Menu _menu;
         private readonly MenuItem _menuItem1;
-        
+
         private readonly IMenuRepository _menuRepository = Substitute.For<IMenuRepository>();
         private readonly MenuService _sut;
 
         public MenuServiceTests()
         {
             _sut = new MenuService(_menuRepository);
-            
+
             _menu = _fixture
                 .Build<Menu>()
                 .Create();
-            
+
             _menuItem1 = _fixture
                 .Build<MenuItem>()
                 .With(i => i.Price, Price1)
@@ -57,7 +56,7 @@ namespace DomainTests.Services
 
             var exception = Record
                 .ExceptionAsync(async () => await _sut.AddMenuItem(_menu, _menuItem1));
-            
+
             exception.Should().NotBeNull();
             exception.Result.Should().NotBeNull();
             exception.Result?.Message.Should().Be("Item already exists");
@@ -69,7 +68,7 @@ namespace DomainTests.Services
             _menuRepository.AddMenuItem(_menu, _menuItem1).Returns(Task.FromResult(false));
             var exception = Record
                 .ExceptionAsync(async () => await _sut.AddMenuItem(_menu, _menuItem1));
-            
+
             exception.Should().NotBeNull();
             exception.Result.Should().NotBeNull();
             exception.Result?.Message.Should().Be("Something went wrong");

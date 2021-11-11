@@ -9,7 +9,6 @@ using Domain.Interfaces;
 using Domain.Interfaces.Services;
 using Domain.Models;
 using Domain.Models.Auth;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using Serilog;
 
@@ -28,7 +27,8 @@ namespace Domain.Services
             _logger = logger;
         }
 
-        public async Task<AuthenticationResult> RegisterAsync(string username, string email, string password, UserType userType = UserType.User)
+        public async Task<AuthenticationResult> RegisterAsync(string username, string email, string password,
+            UserType userType = UserType.User)
         {
             var existingUser = await _userManager.FindByEmailAsync(email);
 

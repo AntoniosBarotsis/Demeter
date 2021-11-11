@@ -10,13 +10,13 @@ using Serilog;
 namespace Application.Controllers
 {
     /// <summary>
-    /// The users controller
+    ///     The users controller
     /// </summary>
     [ApiController]
     [ApiExplorerSettings(GroupName = "v1")]
     [Route("v1/[controller]")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "User")]
-    public class UsersController: ControllerBase
+    public class UsersController : ControllerBase
     {
         private readonly ILogger _logger;
         private readonly IMediator _mediator;
@@ -28,7 +28,7 @@ namespace Application.Controllers
         }
 
         /// <summary>
-        /// Get all users
+        ///     Get all users
         /// </summary>
         /// <returns>A list of all users</returns>
         [HttpGet]

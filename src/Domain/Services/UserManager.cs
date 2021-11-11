@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Domain.Services
 {
-    public class UserManager: IUserManager
+    public class UserManager : IUserManager
     {
         private readonly UserManager<User> _userManager;
 

@@ -1,5 +1,4 @@
-﻿using System;
-using Domain.Models;
+﻿using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data
@@ -20,7 +19,7 @@ namespace Infrastructure.Data
                 .Entity<User>()
                 .Property(u => u.UserType)
                 .HasConversion<string>();
-                
+
             modelBuilder
                 .Entity<User>()
                 .HasMany(u => u.PastOrders);

@@ -10,7 +10,6 @@ namespace Application.Config
         private readonly AttributeRouteModel _routePrefix;
 
         /// <summary>
-        /// 
         /// </summary>
         /// <param name="route"></param>
         public RoutePrefixConvention(IRouteTemplateProvider route)
@@ -22,11 +21,9 @@ namespace Application.Config
         public void Apply(ApplicationModel application)
         {
             foreach (var selector in application.Controllers.SelectMany(c => c.Selectors))
-            {
-                selector.AttributeRouteModel = selector.AttributeRouteModel != null ? 
-                    AttributeRouteModel.CombineAttributeRouteModel(_routePrefix, selector.AttributeRouteModel) : 
-                    _routePrefix;
-            }
+                selector.AttributeRouteModel = selector.AttributeRouteModel != null
+                    ? AttributeRouteModel.CombineAttributeRouteModel(_routePrefix, selector.AttributeRouteModel)
+                    : _routePrefix;
         }
     }
 }

@@ -19,12 +19,12 @@ namespace Domain.Services
         {
             if (menu.MenuItems.Contains(menuItem))
                 throw new Exception("Item already exists");
-            
+
             if (!await _menuRepository.AddMenuItem(menu, menuItem))
                 throw new Exception("Something went wrong");
 
             await _menuRepository.SaveChanges();
-            
+
             menu.MenuItems.Add(menuItem);
 
             return menu;

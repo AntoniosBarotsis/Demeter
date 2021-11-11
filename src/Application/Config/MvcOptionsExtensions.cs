@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.Routing;
 namespace Application.Config
 {
     /// <summary>
-    /// Adds a route prefix to the controllers
+    ///     Adds a route prefix to the controllers
     /// </summary>
     public static class MvcOptionsExtensions
     {
@@ -14,7 +14,7 @@ namespace Application.Config
         }
 
         /// <summary>
-        /// Adds the route attribute
+        ///     Adds the route attribute
         /// </summary>
         /// <param name="opts"></param>
         /// <param name="prefix"></param>

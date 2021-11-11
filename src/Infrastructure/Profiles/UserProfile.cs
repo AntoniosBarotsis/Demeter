@@ -4,7 +4,7 @@ using Infrastructure.DTOs.Response;
 
 namespace Infrastructure.Profiles
 {
-    public class UserProfile: Profile
+    public class UserProfile : Profile
     {
         public UserProfile()
         {

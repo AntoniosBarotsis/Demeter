@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Models
@@ -9,8 +8,6 @@ namespace Domain.Models
     /// </summary>
     public class Order
     {
-        [Key] 
-        public int Id { get; set; }
         public ICollection<MenuItem> Items;
 
         public Order()
@@ -18,6 +15,8 @@ namespace Domain.Models
             Items = new List<MenuItem>();
             Price = 0;
         }
+
+        [Key] public int Id { get; set; }
 
         // This will be calculated, not stored
         public double Price { get; set; }

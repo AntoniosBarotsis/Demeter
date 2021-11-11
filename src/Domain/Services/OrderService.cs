@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Domain.Interfaces;
 using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
 using Domain.Models;

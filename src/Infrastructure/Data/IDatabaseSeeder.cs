@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace Infrastructure.Data
+﻿namespace Infrastructure.Data
 {
     public interface IDatabaseSeeder
     {

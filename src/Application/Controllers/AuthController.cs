@@ -22,7 +22,7 @@ namespace Application.Controllers
         }
 
         /// <summary>
-        /// Registers a user to the database. Returns a token.
+        ///     Registers a user to the database. Returns a token.
         /// </summary>
         /// <param name="request"></param>
         /// <returns></returns>

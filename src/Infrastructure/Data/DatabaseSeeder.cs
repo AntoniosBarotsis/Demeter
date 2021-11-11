@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Domain.Interfaces;
 using Domain.Models;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -27,17 +24,17 @@ namespace Infrastructure.Data
         public void Seed()
         {
             _logger.Information("Seeding Database...");
-            
+
             // Create users
-            var order = new Order {Id = 1, Items = null, Price = 42};
+            var order = new Order { Id = 1, Items = null, Price = 42 };
             var u1 = new User("Tony", "test@test.com");
             u1.PastOrders.Add(order);
-            
+
             var users = new List<User>
             {
                 u1
             };
-            
+
             using var serviceScope = _scopeFactory.CreateScope();
             using var context = serviceScope.ServiceProvider.GetService<DemeterDbContext>();
 
@@ -46,32 +43,32 @@ namespace Infrastructure.Data
                 _logger.Fatal("Context is null");
                 throw new Exception("Context is null");
             }
-            
+
             // Clear all users from the database
             context.Users.RemoveRange(context.Users);
             context.Orders.RemoveRange(context.Orders);
             context.SaveChanges();
-            
+
             // Push the users from the list
             foreach (var user in users)
             {
                 var succeeded = _userManager.CreateAsync(user, "password").Result.Succeeded;
-                
+
                 if (!succeeded)
                     Log.Error($"Failed to add user {user}");
             }
-            
+
             _logger.Information("Done");
         }
 
         public void Initialize()
         {
             _logger.Information("Applying Database Migrations...");
-            
+
             using var serviceScope = _scopeFactory.CreateScope();
             using var context = serviceScope.ServiceProvider.GetService<DemeterDbContext>();
             context?.Database.Migrate();
-            
+
             _logger.Information("Done");
         }
     }

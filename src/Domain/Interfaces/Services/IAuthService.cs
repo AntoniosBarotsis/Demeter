@@ -6,6 +6,7 @@ namespace Domain.Interfaces.Services
 {
     public interface IAuthService
     {
-        Task<AuthenticationResult> RegisterAsync(string username, string email, string password, UserType userType = UserType.User);
+        Task<AuthenticationResult> RegisterAsync(string username, string email, string password,
+            UserType userType = UserType.User);
     }
 }

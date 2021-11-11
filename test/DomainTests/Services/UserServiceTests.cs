@@ -42,8 +42,7 @@ namespace DomainTests.Services
                 .Returns(JsonSerializer.Serialize(new List<User> { _user1 }));
 
             var res = await _sut.FindAll(_cancellationToken);
-
-
+            
             res.Should().NotBeNull();
             res.FirstOrDefault().Should().BeEquivalentTo(_user1);
             await _cacheService.Received(1).GetCacheValueAsync(ICacheService.Entity.Users, ICacheService.Type.FindAll);

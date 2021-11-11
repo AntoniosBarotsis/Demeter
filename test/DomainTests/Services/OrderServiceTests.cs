@@ -14,9 +14,9 @@ namespace DomainTests.Services
         private const double Price1 = 42.0;
         private const double Price2 = 2.0;
         private readonly IFixture _fixture = new Fixture();
-        private readonly Order _order;
         private readonly MenuItem _menuItem1;
         private readonly MenuItem _menuItem2;
+        private readonly Order _order;
 
         private readonly IOrderRepository _orderRepository = Substitute.For<IOrderRepository>();
         private readonly OrderService _sut;
@@ -24,17 +24,17 @@ namespace DomainTests.Services
         public OrderServiceTests()
         {
             _sut = new OrderService(_orderRepository);
-            
+
             _menuItem1 = _fixture
                 .Build<MenuItem>()
                 .With(i => i.Price, -1)
                 .Create();
-            
+
             _menuItem2 = _fixture
                 .Build<MenuItem>()
                 .With(i => i.Price, -1)
                 .Create();
-            
+
             _order = _fixture
                 .Create<Order>();
         }
@@ -54,7 +54,7 @@ namespace DomainTests.Services
             await _orderRepository.Received(1).SaveChanges();
 
             await _sut.AddItemToOrder(order, _menuItem2);
-            
+
             order.Price.Should().Be(Price1 + Price2);
             await _orderRepository.Received(2).UpdateOrder(order);
             await _orderRepository.Received(2).SaveChanges();
