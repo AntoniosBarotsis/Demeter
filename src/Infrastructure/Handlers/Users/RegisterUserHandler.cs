@@ -18,7 +18,7 @@ namespace Infrastructure.Handlers.Users
 
         public async Task<AuthenticationResult> Handle(RegisterUser request, CancellationToken cancellationToken)
         {
-            return await _authService.RegisterAsync(request.Username, request.Password, request.Email);
+            return await _authService.RegisterAsync(request.Username, request.Email, request.Password);
         }
     }
 }
