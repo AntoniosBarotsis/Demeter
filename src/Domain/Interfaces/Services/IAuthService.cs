@@ -8,5 +8,7 @@ namespace Domain.Interfaces.Services
     {
         Task<AuthenticationResult> RegisterAsync(string username, string email, string password,
             UserType userType = UserType.User);
+
+        Task<AuthenticationResult> LoginAsync(string email, string password);
     }
 }

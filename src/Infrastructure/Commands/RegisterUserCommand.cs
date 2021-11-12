@@ -3,9 +3,9 @@ using MediatR;
 
 namespace Infrastructure.Commands
 {
-    public class RegisterUser : IRequest<AuthenticationResult>
+    public class RegisterUserCommand : IRequest<AuthenticationResult>
     {
-        public RegisterUser(string username, string email, string password)
+        public RegisterUserCommand(string username, string email, string password)
         {
             Username = username;
             Email = email;

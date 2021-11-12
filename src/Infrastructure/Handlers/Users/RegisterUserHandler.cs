@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Infrastructure.Handlers.Users
 {
-    public class RegisterUserHandler : IRequestHandler<RegisterUser, AuthenticationResult>
+    public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, AuthenticationResult>
     {
         private readonly IAuthService _authService;
 
@@ -16,7 +16,7 @@ namespace Infrastructure.Handlers.Users
             _authService = authService;
         }
 
-        public async Task<AuthenticationResult> Handle(RegisterUser request, CancellationToken cancellationToken)
+        public async Task<AuthenticationResult> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
         {
             return await _authService.RegisterAsync(request.Username, request.Email, request.Password);
         }

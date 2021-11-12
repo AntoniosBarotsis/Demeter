@@ -2,7 +2,7 @@
 
 namespace Infrastructure.DTOs.Request
 {
-    public class UserRegistrationRequest
+    public class UserLoginRequest
     {
         public string UserName { get; set; }
         [EmailAddress]
