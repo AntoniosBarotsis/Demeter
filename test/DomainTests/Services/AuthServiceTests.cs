@@ -68,7 +68,7 @@ namespace DomainTests.Services
         public async Task RegisterExistingUserTest()
         {
             _userManager.FindByEmailAsync(_user.Email)
-                .Returns(Task.FromResult(new User(_user.UserName, _user.Password)));
+                .Returns(new User(_user.UserName, _user.Email));
 
             var res = await _sut.RegisterAsync(_user.UserName, _user.Email, _user.Password);
 
