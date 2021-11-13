@@ -28,5 +28,10 @@ namespace Domain.Services
         {
             return _userManager.CheckPasswordAsync(user, password);
         }
+
+        public Task<User> FindByIdAsync(string userId)
+        {
+            return _userManager.FindByIdAsync(userId);
+        }
     }
 }

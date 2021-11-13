@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoFixture;
 using Domain.Interfaces;
+using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
 using Domain.Models;
 using Domain.Models.Auth;
@@ -10,6 +11,7 @@ using Domain.Services;
 using FluentAssertions;
 using Infrastructure.DTOs.Request;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
 using Serilog;
@@ -32,10 +34,13 @@ namespace DomainTests.Services
         private readonly ITestOutputHelper _testOutputHelper;
         private readonly UserRegistrationRequest _user;
         private readonly IUserManager _userManager = Substitute.For<IUserManager>();
+        private readonly TokenValidationParameters _tokenValidationParameters;
+        private readonly IAuthRepository _authRepository;
 
-        public AuthServiceTests(ITestOutputHelper testOutputHelper)
+        public AuthServiceTests(ITestOutputHelper testOutputHelper, IAuthRepository authRepository)
         {
             _testOutputHelper = testOutputHelper;
+            _authRepository = authRepository;
             _jwtConfig = new JwtConfig
             {
                 Secret = "verysecretkeythatislongerthan32chars",
@@ -45,7 +50,7 @@ namespace DomainTests.Services
             _user = _fixture
                 .Create<UserRegistrationRequest>();
 
-            _sut = new AuthService(_userManager, _jwtConfig, _logger);
+            _sut = new AuthService(_userManager, _jwtConfig, _logger,_tokenValidationParameters, _authRepository);
         }
 
         [Fact]

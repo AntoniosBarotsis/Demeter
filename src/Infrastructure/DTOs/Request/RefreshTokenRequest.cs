@@ -1,6 +1,6 @@
-﻿namespace Domain.Models.Auth
+﻿namespace Infrastructure.DTOs.Request
 {
-    public class AuthSuccessResponse
+    public class RefreshTokenRequest
     {
         public string Token { get; set; }
         public string RefreshToken { get; set; }

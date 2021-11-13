@@ -44,18 +44,7 @@ namespace Application.Controllers
             var authResponse =
                 await _mediator.Send(new RegisterUserCommand(request.UserName, request.Email, request.Password));
 
-            if (!authResponse.Success)
-            {
-                return BadRequest(new AuthFailedResponse
-                {
-                    ErrorMessages = authResponse.Errors
-                });
-            }
-
-            return Ok(new AuthSuccessResponse
-            {
-                Token = authResponse.Token
-            });
+            return HandleAuthenticationResult(authResponse);
         }
 
         [HttpPost("login")]
@@ -63,7 +52,21 @@ namespace Application.Controllers
         {
             var authResponse = 
                 await _mediator.Send(new LoginUserQuery(request.Email, request.Password));
+
+            return HandleAuthenticationResult(authResponse);
+        }
+
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh([FromBody] RefreshTokenRequest request)
+        {
+            var authResponse = 
+                await _mediator.Send(new RefreshTokenCommand(request.Token, request.RefreshToken));
             
+            return HandleAuthenticationResult(authResponse);
+        }
+        
+        private IActionResult HandleAuthenticationResult(AuthenticationResult authResponse)
+        {
             if (!authResponse.Success)
             {
                 return BadRequest(new AuthFailedResponse
@@ -71,10 +74,11 @@ namespace Application.Controllers
                     ErrorMessages = authResponse.Errors
                 });
             }
-            
+
             return Ok(new AuthSuccessResponse
             {
-                Token = authResponse.Token
+                Token = authResponse.Token,
+                RefreshToken = authResponse.RefreshToken
             });
         }
     }

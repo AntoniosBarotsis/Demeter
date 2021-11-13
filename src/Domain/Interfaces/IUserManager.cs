@@ -9,5 +9,6 @@ namespace Domain.Interfaces
         Task<User> FindByEmailAsync(string email);
         Task<IdentityResult> CreateAsync(User user, string password);
         Task<bool> CheckPasswordAsync(User user, string password);
+        Task<User> FindByIdAsync(string userId);
     }
 }

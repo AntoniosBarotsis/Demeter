@@ -45,6 +45,7 @@ namespace Infrastructure.Data
             }
 
             // Clear all users from the database
+            context.RefreshTokens.RemoveRange(context.RefreshTokens);
             context.Users.RemoveRange(context.Users);
             context.Orders.RemoveRange(context.Orders);
             context.SaveChanges();

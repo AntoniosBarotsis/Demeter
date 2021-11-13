@@ -10,5 +10,7 @@ namespace Domain.Interfaces.Services
             UserType userType = UserType.User);
 
         Task<AuthenticationResult> LoginAsync(string email, string password);
+
+        Task<AuthenticationResult> RefreshTokenAsync(string token, string refreshToken);
     }
 }
