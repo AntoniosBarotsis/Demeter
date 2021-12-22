@@ -129,7 +129,7 @@ namespace Application
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtConfig.Secret)),
                 ValidateIssuer = false,
                 ValidateAudience = false,
-                RequireExpirationTime = false,
+                RequireExpirationTime = true,
                 ValidateLifetime = true
             };
 

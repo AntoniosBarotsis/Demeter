@@ -37,10 +37,11 @@ namespace DomainTests.Services
         private readonly TokenValidationParameters _tokenValidationParameters;
         private readonly IAuthRepository _authRepository;
 
-        public AuthServiceTests(ITestOutputHelper testOutputHelper, IAuthRepository authRepository)
+        public AuthServiceTests(ITestOutputHelper testOutputHelper, IAuthRepository authRepository, TokenValidationParameters tokenValidationParameters)
         {
             _testOutputHelper = testOutputHelper;
             _authRepository = authRepository;
+            _tokenValidationParameters = tokenValidationParameters;
             _jwtConfig = new JwtConfig
             {
                 Secret = "verysecretkeythatislongerthan32chars",

@@ -100,9 +100,7 @@ namespace Domain.Services
                         .Single(x => x.Type == JwtRegisteredClaimNames.Exp)
                         .Value
                     );
-            var expiryDateUtc =
-                new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)
-                    .AddSeconds(expiryDateUnix);
+            var expiryDateUtc = DateTime.UnixEpoch.AddSeconds(expiryDateUnix);
             
             if (expiryDateUtc > DateTime.Now)
             {
@@ -176,7 +174,9 @@ namespace Domain.Services
 
             try
             {
+                _tokenValidationParameters.ValidateLifetime = false;
                 var principal = tokenHandler.ValidateToken(token, _tokenValidationParameters, out var validatedToken);
+                _tokenValidationParameters.ValidateLifetime = true;
 
                 return !IsJwtWithValidSecurityAlgorithm(validatedToken) ? null : principal;
             }
@@ -210,7 +210,7 @@ namespace Domain.Services
                     new Claim("id", newUser.Id),
                     new Claim(ClaimTypes.Role, role)
                 }),
-                Expires = DateTime.UtcNow.AddHours(_jwtConfig.TokenLifetime.TotalMinutes),
+                Expires = DateTime.UtcNow.AddSeconds(_jwtConfig.TokenLifetime.TotalSeconds),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key),
                     SecurityAlgorithms.HmacSha512Signature)
             };
