@@ -1,9 +1,11 @@
 ﻿using System;
-using System.Text.Json;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Domain.Interfaces;
+using Domain.Models;
 using Serilog;
 using StackExchange.Redis;
+using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace Infrastructure.Data.Redis
 {
@@ -23,7 +25,24 @@ namespace Infrastructure.Data.Redis
             var key = CreateKey(entity, type);
             var res = await _cache.StringGetAsync(key);
 
-            _logger.Information(res.HasValue ? $"Cache hit for {key}" : $"Cache miss for {key}");
+            if (res.HasValue)
+            {
+                _logger.Information("Cache [HIT] for {Key}", key);
+                _logger.Debug("Result was {Result}", res);
+                
+                var data = JsonSerializer.Deserialize<List<User>>(res)?[0];
+                var username = JsonSerializer.Deserialize<List<User>>(res)?[0].UserName;
+                
+                _logger.Debug(
+                    "User {Username} has {PastOrderCount} past orders",
+                    username, 
+                    data?.PastOrders?.Count
+                );
+            }
+            else
+            {
+                _logger.Information("Cache [MISS] for {Key}", key);
+            }
 
             return res.HasValue ? res.ToString() : null;
         }
@@ -31,6 +50,8 @@ namespace Infrastructure.Data.Redis
         public async Task SetCacheValueAsync(ICacheService.Entity entity, ICacheService.Type type, object value)
         {
             var key = CreateKey(entity, type);
+            
+            _logger.Debug("Serialized object: {Object}", JsonSerializer.Serialize(value));
 
             await _cache.StringSetAsync(key, JsonSerializer.Serialize(value),
                 new TimeSpan(0, 0, 0, 5));
@@ -40,9 +61,11 @@ namespace Infrastructure.Data.Redis
         {
             var idPart = id is null ? "" : $":{id}";
 
-            return $"{entity.ToString().ToLower()}:" +
+            var key = $"{entity.ToString().ToLower()}:" +
                    $"{type.ToString().ToLower()}" +
                    $"{idPart}";
+            
+            return key;
         }
     }
 }
