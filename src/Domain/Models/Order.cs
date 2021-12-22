@@ -9,9 +9,13 @@ namespace Domain.Models
     /// </summary>
     public class Order
     {
-
         [Key] public int Id { get; set; }
         public ICollection<MenuItem> Items { get; set; }
         [NotMapped] public double Price { get; set; }
+
+        public Order()
+        {
+            Items = new List<MenuItem>();
+        }
     }
 }

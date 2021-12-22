@@ -35,13 +35,11 @@ namespace DomainTests.Services
         private readonly UserRegistrationRequest _user;
         private readonly IUserManager _userManager = Substitute.For<IUserManager>();
         private readonly TokenValidationParameters _tokenValidationParameters;
-        private readonly IAuthRepository _authRepository;
+        private readonly IAuthRepository _authRepository = Substitute.For<IAuthRepository>();
 
-        public AuthServiceTests(ITestOutputHelper testOutputHelper, IAuthRepository authRepository, TokenValidationParameters tokenValidationParameters)
+        public AuthServiceTests(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
-            _authRepository = authRepository;
-            _tokenValidationParameters = tokenValidationParameters;
             _jwtConfig = new JwtConfig
             {
                 Secret = "verysecretkeythatislongerthan32chars",
