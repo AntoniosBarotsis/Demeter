@@ -12,6 +12,7 @@ namespace Infrastructure.Data
 
         public DbSet<User> Users { get; set; }
         public DbSet<Order> Orders { get; set; }
+        public DbSet<MenuItem> MenuItems { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -25,6 +26,11 @@ namespace Infrastructure.Data
             modelBuilder
                 .Entity<User>()
                 .HasMany(u => u.PastOrders);
+
+            modelBuilder
+                .Entity<Order>()
+                .HasMany(o => o.Items);
+            
         }
     }
 }
