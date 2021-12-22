@@ -1,6 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Infrastructure.Queries;
 using Infrastructure.Queries.Users;
 using MediatR;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -31,12 +35,40 @@ namespace Application.Controllers
         ///     Get all users
         /// </summary>
         /// <returns>A list of all users</returns>
-        [HttpGet]
+        /// <remarks>This is for testing purposes and should be removed in the future</remarks>
+        [HttpGet("getAll")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAllUsers()
         {
             var res = await _mediator.Send(new GetAllUsersQuery());
             return Ok(res);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public async Task<IActionResult> GetUser()
+        {
+            try
+            {
+                var authRes = await HttpContext.AuthenticateAsync();
+
+                if (authRes.Principal is null) return BadRequest();
+            
+                var id = authRes.Principal.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+
+                var res = await _mediator.Send(new GetUserQuery(id));
+
+                if (res is null)
+                    return BadRequest("Make sure your token is valid");
+                
+                return Ok(res);
+            }
+            catch (Exception e)
+            {
+                _logger.Error("Exception in GetUser {Message}, stacktrace: {Stacktrace}", e.Message, e.StackTrace);
+                return Problem();
+            }
         }
     }
 }
