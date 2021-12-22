@@ -8,5 +8,6 @@ namespace Domain.Interfaces.Services
     public interface IUserService
     {
         Task<List<User>> FindAll(CancellationToken cancellationToken);
+        Task<User> FindOne(string id, CancellationToken cancellationToken);
     }
 }

@@ -32,5 +32,11 @@ namespace Domain.Services
 
             return res;
         }
+
+        public Task<User> FindOne(string id, CancellationToken cancellationToken)
+        {
+            // TODO Caching but actually move all caching to the repository as it is still data access and not business logic
+            return _userRepository.FindOne(id, cancellationToken);
+        }
     }
 }
