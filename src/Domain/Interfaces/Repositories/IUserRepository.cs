@@ -8,5 +8,6 @@ namespace Domain.Interfaces.Repositories
     public interface IUserRepository
     {
         Task<List<User>> FindAll(CancellationToken cancellationToken);
+        Task<User> FindOne(string id, CancellationToken cancellationToken);
     }
 }
