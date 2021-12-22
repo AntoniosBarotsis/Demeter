@@ -26,7 +26,8 @@ namespace Infrastructure.Data
             _logger.Information("Seeding Database...");
 
             // Create users
-            var order = new Order { Id = 1, Items = null, Price = 42 };
+            var item = new MenuItem("itemName", "itemDesc", 42, "");
+            var order = new Order { Id = 1, Items = new List<MenuItem>{item}, Price = 42 };
             var u1 = new User("Tony", "test@test.com");
             u1.PastOrders.Add(order);
 
@@ -48,6 +49,7 @@ namespace Infrastructure.Data
             context.RefreshTokens.RemoveRange(context.RefreshTokens);
             context.Users.RemoveRange(context.Users);
             context.Orders.RemoveRange(context.Orders);
+            context.MenuItems.RemoveRange(context.MenuItems);
             context.SaveChanges();
 
             // Push the users from the list
@@ -56,7 +58,7 @@ namespace Infrastructure.Data
                 var succeeded = _userManager.CreateAsync(user, "password").Result.Succeeded;
 
                 if (!succeeded)
-                    Log.Error($"Failed to add user {user}");
+                    Log.Error("Failed to add user {User}", user.UserName);
             }
 
             _logger.Information("Done");
