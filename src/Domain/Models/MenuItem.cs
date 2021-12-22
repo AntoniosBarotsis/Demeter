@@ -1,4 +1,6 @@
-﻿namespace Domain.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Domain.Models
 {
     /// <summary>
     ///     Represents any item you could order from a restaurant
@@ -14,6 +16,7 @@
             IsAvailable = true;
         }
 
+        [Key] public int Id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public double Price { get; set; }

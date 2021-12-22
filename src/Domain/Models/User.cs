@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using KellermanSoftware.CompareNetObjects;
 
 namespace Domain.Models
@@ -20,7 +21,20 @@ namespace Domain.Models
             UserType = UserType.User;
         }
 
-        public List<Order> PastOrders { get; }
+        public User(string userName, string email, List<Order> orders)
+        {
+            UserName = userName;
+            Email = email;
+            PastOrders = orders;
+            UserType = UserType.User;
+        }
+
+        public User()
+        {
+        }
+
+        [JsonInclude]
+        public List<Order> PastOrders { get; private set; }
 
         public override bool Equals(object obj)
         {
