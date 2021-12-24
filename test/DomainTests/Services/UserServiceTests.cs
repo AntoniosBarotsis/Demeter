@@ -69,5 +69,18 @@ namespace DomainTests.Services
                 .SetCacheValueAsync(ICacheService.Entity.Users, ICacheService.Type.FindAll, res);
             await _cacheService.Received(1).GetCacheValueAsync(ICacheService.Entity.Users, ICacheService.Type.FindAll);
         }
+
+        [Fact]
+        public async Task FindOne()
+        {
+            var cancellationToken = new CancellationToken();
+            _userRepository.FindOne(_user1.Id, cancellationToken)
+                .Returns(_user1);
+
+            var res = await _sut.FindOne(_user1.Id, cancellationToken);
+
+            res.Should().BeEquivalentTo(_user1);
+            await _userRepository.Received().FindOne(_user1.Id, cancellationToken);
+        }
     }
 }
