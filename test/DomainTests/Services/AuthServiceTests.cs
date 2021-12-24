@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoFixture;
 using Domain.Interfaces;
@@ -11,6 +13,7 @@ using Domain.Services;
 using FluentAssertions;
 using Infrastructure.DTOs.Request;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using NSubstitute;
 using NSubstitute.ReturnsExtensions;
@@ -37,6 +40,8 @@ namespace DomainTests.Services
         private readonly IUserManager _userManager = Substitute.For<IUserManager>();
         private readonly TokenValidationParameters _tokenValidationParameters;
         private readonly IAuthRepository _authRepository = Substitute.For<IAuthRepository>();
+        private readonly ITokenService _tokenService = Substitute.For<ITokenService>();
+        // private readonly ITokenService _tokenService;
 
         public AuthServiceTests(ITestOutputHelper testOutputHelper)
         {
@@ -55,7 +60,23 @@ namespace DomainTests.Services
                 .With(el => el.Email, _userRegistrationRequest.Email)
                 .Create();
 
-            _sut = new AuthService(_userManager, _jwtConfig, _logger, _tokenValidationParameters, _authRepository);
+            // _tokenService = new TokenService(_logger, _authRepository, _jwtConfig, _tokenValidationParameters);
+
+            _sut = new AuthService(_userManager, _jwtConfig, _logger, _tokenValidationParameters, _authRepository, _tokenService);
+        }
+
+        private ClaimsPrincipal GetClaimsPrincipal(int mins = 10)
+        {
+            var claimsIdentity = new ClaimsIdentity();
+            claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
+            var time = DateTime.Now.AddMinutes(mins) - DateTime.Now;
+            var date = time.Ticks;
+            claimsIdentity.AddClaim(new Claim(JwtRegisteredClaimNames.Exp, date.ToString()));
+            var claimsPrincipal = new ClaimsPrincipal();
+            claimsIdentity.AddClaim(new Claim("id", "userId"));
+            claimsPrincipal.AddIdentity(claimsIdentity);
+
+            return claimsPrincipal;
         }
 
         [Fact]
@@ -69,9 +90,7 @@ namespace DomainTests.Services
 
             var res = await _sut.RegisterAsync(_userRegistrationRequest.UserName, _userRegistrationRequest.Email, _userRegistrationRequest.Password);
 
-            res.Should().NotBeNull();
-            res.Errors.Should().BeNull();
-            res.Success.Should().BeTrue();
+            await _tokenService.Received().GenerateAuthenticationResultAsync(Arg.Any<User>());
         }
 
         [Fact]
@@ -114,12 +133,9 @@ namespace DomainTests.Services
             _userManager.CheckPasswordAsync(_user, _userRegistrationRequest.Password)
                 .Returns(Task.FromResult(true));
             
-            var res = await _sut.LoginAsync(_userRegistrationRequest.Email, _userRegistrationRequest.Password);
+            await _sut.LoginAsync(_userRegistrationRequest.Email, _userRegistrationRequest.Password);
 
-            res.Should().NotBeNull();
-            res.Errors.Should().BeNull();
-            res.Success.Should().BeTrue();
-            res.Token.Should().NotBeNull();
+            await _tokenService.Received().GenerateAuthenticationResultAsync(Arg.Any<User>());
         }
 
         [Fact]
@@ -158,13 +174,35 @@ namespace DomainTests.Services
         [Fact]
         public async Task RefreshToken()
         {
-            var res = await _sut.RefreshTokenAsync("token", "refreshToken");
-            _testOutputHelper.WriteLine("a");
+            var claims = GetClaimsPrincipal();
+            var tokenId = claims.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
+            
+            _tokenService.GetPrincipalFromToken("token")
+                .Returns(claims);
+            
+            var refreshToken = new RefreshToken
+            {
+                Invalidated = false,
+                ExpiryDate = DateTime.Now.AddMinutes(10),
+                JwtId = tokenId
+            };
+
+            _authRepository.GetRefreshTokenAsync("refreshToken")
+                .Returns(refreshToken);
+
+            _userManager.FindByIdAsync(Arg.Any<string>())
+                .Returns(_user);
+
+            await _sut.RefreshTokenAsync("token", "refreshToken");
+            await _tokenService.Received().GenerateAuthenticationResultAsync(_user);
         }
 
         [Fact]
         public async Task RefreshInvalidToken()
         {
+            _tokenService.GetPrincipalFromToken("token")
+                .ReturnsNull();
+            
             var res = await _sut.RefreshTokenAsync("token", "refreshToken");
 
             res.Should().NotBeNull();
@@ -172,6 +210,127 @@ namespace DomainTests.Services
             res.Errors.Should().NotBeNull();
             res.Errors.Count().Should().Be(1);
             res.Errors.FirstOrDefault().Should().Be("Invalid token");
+            res.Token.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task RefreshExpiredToken()
+        {
+            _authRepository.GetRefreshTokenAsync(Arg.Any<string>())
+                .Returns(Task.FromResult(new RefreshToken()));
+            
+            _tokenService.GetPrincipalFromToken("token")
+                .Returns(GetClaimsPrincipal(-10));
+            
+            var res = await _sut.RefreshTokenAsync("token", "refreshToken");
+
+            res.Should().NotBeNull();
+            res.Success.Should().BeFalse();
+            res.Errors.Should().NotBeNull();
+            res.Errors.Count().Should().Be(1);
+            res.Errors.FirstOrDefault().Should().Be("This refresh token has expired");
+            res.Token.Should().BeNull();
+        }
+        
+        [Fact]
+        public async Task RefreshInvalidatedToken()
+        {
+            var token = new RefreshToken
+            {
+                Invalidated = true,
+                ExpiryDate = DateTime.Now.AddMinutes(10)
+            };
+
+            _authRepository.GetRefreshTokenAsync(Arg.Any<string>())
+                .Returns(Task.FromResult(token));
+            
+            _tokenService.GetPrincipalFromToken("token")
+                .Returns(GetClaimsPrincipal());
+            
+            var res = await _sut.RefreshTokenAsync("token", "refreshToken");
+
+            res.Should().NotBeNull();
+            res.Success.Should().BeFalse();
+            res.Errors.Should().NotBeNull();
+            res.Errors.Count().Should().Be(1);
+            res.Errors.FirstOrDefault().Should().Be("This refresh token has been invalidated");
+            res.Token.Should().BeNull();
+        }
+        
+        [Fact]
+        public async Task RefreshUsedToken()
+        {
+            var token = new RefreshToken
+            {
+                Invalidated = false,
+                Used = true,
+                ExpiryDate = DateTime.Now.AddMinutes(10)
+            };
+
+            _authRepository.GetRefreshTokenAsync(Arg.Any<string>())
+                .Returns(Task.FromResult(token));
+            
+            _tokenService.GetPrincipalFromToken("token")
+                .Returns(GetClaimsPrincipal());
+            
+            var res = await _sut.RefreshTokenAsync("token", "refreshToken");
+
+            res.Should().NotBeNull();
+            res.Success.Should().BeFalse();
+            res.Errors.Should().NotBeNull();
+            res.Errors.Count().Should().Be(1);
+            res.Errors.FirstOrDefault().Should().Be("This token has been used");
+            res.Token.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task RefreshTokenDoesNotExist()
+        {
+            _authRepository.GetRefreshTokenAsync(Arg.Any<string>())
+                .ReturnsNull();
+            
+            _tokenService.GetPrincipalFromToken("token")
+                .Returns(GetClaimsPrincipal(-10));
+            
+            var res = await _sut.RefreshTokenAsync("token", "refreshToken");
+
+            res.Should().NotBeNull();
+            res.Success.Should().BeFalse();
+            res.Errors.Should().NotBeNull();
+            res.Errors.Count().Should().Be(1);
+            res.Errors.FirstOrDefault().Should().Be("This refresh token does not exist");
+            res.Token.Should().BeNull();
+        }
+
+        [Fact]
+        public async Task RefreshTokenIdDoesNotMatchTokenId()
+        {
+            var claims = GetClaimsPrincipal();
+            var tokenId = claims.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
+            
+            _tokenService.GetPrincipalFromToken("token")
+                .Returns(claims);
+            
+            var refreshToken = new RefreshToken
+            {
+                Invalidated = false,
+                ExpiryDate = DateTime.Now.AddMinutes(10),
+                JwtId = tokenId + "1"
+            };
+
+            _authRepository.GetRefreshTokenAsync("refreshToken")
+                .Returns(refreshToken);
+
+            _userManager.FindByIdAsync(Arg.Any<string>())
+                .Returns(_user);
+
+            var res = await _sut.RefreshTokenAsync("token", "refreshToken");
+            
+            res.Should().NotBeNull();
+            res.Success.Should().BeFalse();
+            res.Errors.Should().NotBeNull();
+            res.Errors.Count().Should().Be(1);
+            res.Errors.FirstOrDefault().Should().Be("This refresh token does not match this JWT");
             res.Token.Should().BeNull();
         }
     }
