@@ -4,7 +4,7 @@ ignore:
   - "^.*Models.*$"
   - "^.*Migrations.*$"
   - "^.*Infrastructure.*$"
-  - "^.*Domain.Services.UserManager$"
+  - "^.*Domain.Services.UserManager.*$"
 
 coverage:
   status:
